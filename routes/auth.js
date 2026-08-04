@@ -1,20 +1,28 @@
-const express = require("express");
+import express from 'express';
+import {
+  register,
+  login,
+  logout,
+  getMe,
+  refreshToken,
+  changePassword,
+  forgotPassword,
+  resetPassword
+} from '../controllers/authController.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Public routes
+router.post('/register', register);
+router.post('/login', login);
+router.post('/forgot-password', forgotPassword);
+router.put('/reset-password/:token', resetPassword);
 
-const {
-register,
-login
-}=require("../controllers/userController");
+// Protected routes
+router.get('/me', protect, getMe);
+router.post('/logout', protect, logout);
+router.post('/refresh-token', refreshToken);
+router.put('/change-password', protect, changePassword);
 
-
-
-router.post("/register",register);
-
-
-router.post("/login",login);
-
-
-
-module.exports = router;
+export default router;
