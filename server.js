@@ -1,106 +1,52 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
 
+import prayerRoutes from "./routes/prayerRoutes.js";
 
-// Routes
-const prayerRoutes = require("./routes/prayerRoutes");
-
-
+dotenv.config();
 
 const app = express();
 
-
 // Middleware
-
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://your-frontend-domain.com"
+      process.env.FRONTEND_URL || "https://your-frontend-domain.com",
     ],
-    credentials:true
+    credentials: true,
   })
 );
 
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(express.urlencoded({
-  extended:true
-}));
-
-
-
+// Root Route
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "DLCSF Global API Server Running 🚀",
+  });
+});
 
 // API Routes
-
 app.use("/api/prayer", prayerRoutes);
 
-
-
-
-
-// Test Route
-
-app.get("/", (req,res)=>{
-
-    res.json({
-
-        message:
-        "DLCSF Global API Server Running"
-
-    });
-
-});
-
-
-
-
-
 // MongoDB Connection
-
 mongoose
-.connect(process.env.MONGO_URI)
-.then(()=>{
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ Database connected successfully");
+  })
+  .catch((err) => {
+    console.error("❌ Database connection failed:", err.message);
+  });
 
-    console.log(
-        "Database connected successfully"
-    );
-
-})
-.catch((error)=>{
-
-    console.log(
-        "Database connection failed:",
-        error.message
-    );
-
-});
-
-
-
-
-
-
-// Server Port
-
-const PORT = process.env.PORT || 5000;
-
-
-app.listen(PORT,()=>{
-
-    console.log(
-        `Server running on port ${PORT}`
-    );
-
-});
-import app from './app.js';
-
+// Start Server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📚 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
